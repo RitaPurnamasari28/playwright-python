@@ -42,8 +42,8 @@ jobs:
       run: python triage.py
 
     - name: Generate Allure Report
-        uses: simple-elf/allure-report-action@master
-        with:
+      uses: simple-elf/allure-report-action@master
+      with:
           allure_results: build/allure-results # Pastikan variabel di sebelah kiri menggunakan garis bawah (_)
           gh_pages: gh-pages
           allure_report: allure-report
