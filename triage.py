@@ -24,7 +24,7 @@ def fallback_triage(test_name, error_message):
     return f"### Test: {test_name}\n**Verdict:** [{verdict}]\n**Evidence:** {evidence}\n**Raw Error:** `{error_message.splitlines()[0] if error_message else 'None'}`"
 
 def run_triage():
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     allure_results_dir = "allure-results"
     
     # Inisialisasi client HANYA jika api_key ada
