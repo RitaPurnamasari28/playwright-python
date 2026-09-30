@@ -1,8 +1,8 @@
-from pages.login_page import LoginPage
 from pages.home_page import HomePage
-from pages.companies_page import CompaniesPage
-from playwright.sync_api import expect
 from ai_helper import generate_full_company_data
+from pages.companies_page import CompaniesPage
+from pages.login_page import LoginPage
+from playwright.sync_api import expect
 import allure
 
 def test_add_company(page):
