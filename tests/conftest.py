@@ -52,7 +52,7 @@ def generate_fallback_data() -> BusinessTestData:
             email=fake.company_email(),
             phone=fake.phone_number(),
             street_address=fake.street_address(),
-            industry=fake.job()
+            industry=random.choice(valid_industries)
         ),
         customer=CustomerData(
             name=fake.name(),
