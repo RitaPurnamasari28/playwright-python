@@ -5,7 +5,7 @@ from faker import Faker
 from openai import OpenAI
 
 # =================================================================
-# 1. KUNCI JAWABAN DROPDOWN UI (Wajib disamakan persis dengan UI)
+# KUNCI JAWABAN DROPDOWN UI 
 # =================================================================
 VALID_COMPANY_TYPES = [
     "Importer/Exporter", "Consignor/Consignee", "Marketplace", "Retailer", 
@@ -13,15 +13,13 @@ VALID_COMPANY_TYPES = [
     "Holding Company", "Cooperative (Co-op)", "Franchisee/Franchisor", "Manufacturer"
 ]
 
-# TODO: Sesuaikan daftar ini dengan opsi yang benar-benar ada di UI Anda!
+# Sesuaikan dengan opsi yang ada di UI eSuite Anda
 VALID_INDUSTRY_TYPES = ["Technology", "Finance", "Healthcare", "Education", "Retail"] 
 VALID_LANGUAGES = ["English", "Indonesian"]
 
-# Untuk lokasi, kita kunci dalam satu paket agar AI/Faker tidak mencampuradukkan 
-# provinsi dan kota yang tidak nyambung (mencegah dropdown kosong).
+# Skema dinamis: Indonesia pakai Province/District, negara lain pakai State/Location
 VALID_LOCATIONS = [
     {
-        # Format Indonesia
         "Country": "Indonesia", 
         "Choose Province": "Jawa Barat", 
         "Choose City": "Bandung", 
@@ -30,7 +28,6 @@ VALID_LOCATIONS = [
         "Choose Postal Code": "40111"
     },
     {
-        # Format Negara Lain (Contoh: Malaysia menggunakan State & Location)
         "Country": "Malaysia", 
         "Choose State": "Selangor", 
         "Choose City": "Petaling Jaya", 
@@ -54,31 +51,33 @@ def get_faker_fallback_data():
     Faker.seed(42)
     random.seed(42) 
     
+    # Pilih satu set lokasi
     loc = random.choice(VALID_LOCATIONS)
     
-    return {
+    # Buat data dasar
+    base_data = {
         "Input Company Name": fake.company(),
         "Input Email": fake.company_email(),
-        "phone_country_code": loc["country"],
+        "phone_country_code": loc["Country"], # Menggunakan "Country" kapital agar cocok dengan dict
         "Input Phone": f"812{random.randint(1000000, 9999999)}",
         "Choose Industry Type": random.choice(VALID_INDUSTRY_TYPES), 
         "Choose Company Type": random.choice(VALID_COMPANY_TYPES), 
         "Choose Language": random.choice(VALID_LANGUAGES),        
         "Input Address": fake.street_address(),
-        "Country": loc["country"],
-        "Choose State": loc["state"],
-        "Choose City": loc["city"],
-        "Choose Location": loc["location"],
-        "Choose Postal Code": loc["postal"]
     }
+    
+    # Gabungkan (merge) data lokasi dinamis ke dalam base_data
+    base_data.update(loc)
+    
+    return base_data
 
 def generate_full_company_data():
+    """Fungsi utama menggunakan AI dengan Guardrails ketat."""
     api_key = os.environ.get("OPENAI_API_KEY")
     
     if not api_key:
         return get_faker_fallback_data()
 
-    # 2. PERBARUI PROMPT AGAR AI MENYALIN KEY LOKASI SECARA DINAMIS
     prompt = f"""
     Kamu adalah asisten QA Automation. Hasilkan JSON data perusahaan dummy berformat flat dictionary.
     
@@ -98,7 +97,7 @@ def generate_full_company_data():
         "phone_country_code": "Indonesia",
         "Input Phone": "8123456789",
         "Choose Industry Type": "Technology",
-        "Choose Company Type": "Private",
+        "Choose Company Type": "Retailer",
         "Choose Language": "Indonesian",
         "Input Address": "Jl. Merdeka No 1",
         "Country": "Indonesia",
@@ -108,10 +107,6 @@ def generate_full_company_data():
         "Choose Sub District": "Babakan Ciamis",
         "Choose Postal Code": "40111"
     }}
-    Format Key wajib:
-    "Input Company Name", "Input Email", "phone_country_code", "Input Phone",
-    "Choose Industry Type", "Choose Company Type", "Choose Language", "Input Address",
-    "Country", "Choose State", "Choose City", "Choose Location", "Choose Postal Code"
     """
 
     try:
