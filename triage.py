@@ -1,7 +1,8 @@
 import os
 import glob
 import json
-from openai import OpenAI
+import google.generativeai as genai
+from dotenv import load_dotenv
 
 def fallback_triage(test_name, error_message):
     """Logika triase lokal (tanpa API) sesuai dengan urutan dari soal."""
@@ -28,7 +29,8 @@ def run_triage():
     allure_results_dir = "allure-results"
     
     # Inisialisasi client HANYA jika api_key ada
-    client = OpenAI(api_key=api_key) if api_key else None
+    genai.configure(api_key=api_key)
+    client = genai.GenerativeModel("gemini-pro") if api_key else None
     
     result_files = glob.glob(os.path.join(allure_results_dir, "*-result.json"))
     
