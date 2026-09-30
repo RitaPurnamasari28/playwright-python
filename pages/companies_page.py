@@ -110,7 +110,7 @@ class CompaniesPage:
         self.page.wait_for_timeout(20000)
     
     # 4. Ambil card urutan PALING TERAKHIR di layar saat ini, lalu klik Manage
-        self.page.locator("div.bg-card").filter(has_text="Rodriguez, F").get_by_role("button", name="Manage").click()
+        self.page.locator("div.bg-card").filter(has_text="Rodriguez, F").get_by_role("button", name="Manage").last.click()
         
 
     def delete_company(self):
