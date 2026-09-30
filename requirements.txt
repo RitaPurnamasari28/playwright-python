@@ -4,3 +4,4 @@ allure-pytest
 faker
 google-generativeai
 python-dotenv
+pytest-playwright
