@@ -35,11 +35,19 @@ VALID_LOCATIONS = [
         "Choose Postal Code": "47400"
     },
     {
-        "Country": "Philippines", 
-        "Choose State": "Metro Manila", 
-        "Choose City": "Makati", 
-        "Choose Location": "Bel-Air", 
+        "Country": "Philippines",
+        "Choose Region": "Metro Manila",
+        "Choose Province": "Metro Manila",
+        "Choose City": "Makati",
+        "Choose Barangay": "Bel-Air",
         "Choose Postal Code": "1209"
+    },
+    {
+        "Country": "Cambodia",
+        "Choose Province": "Phnom Penh",
+        "Choose District": "Chamkar Mon",
+        "Choose Commune": "Tonle Basak",
+        "Choose Postal Code": "120101"
     }
 ]
 
