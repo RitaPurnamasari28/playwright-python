@@ -59,5 +59,10 @@ def test_add_company(page):
             print(f"Memastikan teks muncul di layar: {value}")
             elemen_teks = page.get_by_text(str(value), exact=False).first
             expect(elemen_teks).to_be_visible()
+
+    # ---------------------------------------------------------
+    # Tier 2:
+    # Memastikan company berhasil tersimpan dan data yang di simpan benar sesuai dengan data yang di-generate AI atau faker
+    # # ---------------------------------------------------------
     with allure.step("Delete company after validation"):
         companies_page.delete_company()

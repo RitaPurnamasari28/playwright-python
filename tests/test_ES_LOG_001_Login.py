@@ -20,3 +20,7 @@ def test_add_company(page):
         login_page.do_login(login_email, login_password)
     with allure.step("verify login success"):
         login_page.verify_login_success()
+    # ---------------------------------------------------------
+    # Tier 1:
+    # Meamstikan berhasil login dan halaman home terbuka
+    # # ---------------------------------------------------------
