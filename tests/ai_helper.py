@@ -20,10 +20,30 @@ VALID_LANGUAGES = ["English", "Indonesian"]
 # Untuk lokasi, kita kunci dalam satu paket agar AI/Faker tidak mencampuradukkan 
 # provinsi dan kota yang tidak nyambung (mencegah dropdown kosong).
 VALID_LOCATIONS = [
-    {"country": "Indonesia", "state": "Jawa Barat", "city": "Bandung", "location": "Sumur Bandung", "postal": "40111"},
-    {"country": "Malaysia", "state": "Selangor", "city": "Petaling Jaya", "location": "Damansara", "postal": "47400"},
-    {"country": "Philippines", "state": "Metro Manila", "city": "Makati", "location": "Bel-Air", "postal": "1209"},
-    {"country": "Cambodia", "state": "Phnom Penh", "city": "Phnom Penh", "location": "Daun Penh", "postal": "12200"}
+    {
+        # Format Indonesia
+        "Country": "Indonesia", 
+        "Choose Province": "Jawa Barat", 
+        "Choose City": "Bandung", 
+        "Choose District": "Sumur Bandung", 
+        "Choose Sub District": "Babakan Ciamis", 
+        "Choose Postal Code": "40111"
+    },
+    {
+        # Format Negara Lain (Contoh: Malaysia menggunakan State & Location)
+        "Country": "Malaysia", 
+        "Choose State": "Selangor", 
+        "Choose City": "Petaling Jaya", 
+        "Choose Location": "Damansara", 
+        "Choose Postal Code": "47400"
+    },
+    {
+        "Country": "Philippines", 
+        "Choose State": "Metro Manila", 
+        "Choose City": "Makati", 
+        "Choose Location": "Bel-Air", 
+        "Choose Postal Code": "1209"
+    }
 ]
 
 def get_faker_fallback_data():
@@ -53,25 +73,41 @@ def get_faker_fallback_data():
     }
 
 def generate_full_company_data():
-    """Fungsi utama menggunakan AI dengan Guardrails ketat."""
     api_key = os.environ.get("OPENAI_API_KEY")
     
     if not api_key:
         return get_faker_fallback_data()
 
-    # 2. PROMPT DENGAN GUARDRAILS UNTUK SEMUA DROPDOWN
+    # 2. PERBARUI PROMPT AGAR AI MENYALIN KEY LOKASI SECARA DINAMIS
     prompt = f"""
-    Kamu adalah asisten QA Automation. Hasilkan JSON data perusahaan dummy.
+    Kamu adalah asisten QA Automation. Hasilkan JSON data perusahaan dummy berformat flat dictionary.
     
     ATURAN KRITIS UNTUK FIELD DROPDOWN (PILIH SALAH SATU YANG SESUAI):
     - "Choose Company Type" WAJIB dari: {json.dumps(VALID_COMPANY_TYPES)}
     - "Choose Industry Type" WAJIB dari: {json.dumps(VALID_INDUSTRY_TYPES)}
     - "Choose Language" WAJIB dari: {json.dumps(VALID_LANGUAGES)}
     
-    ATURAN KRITIS UNTUK LOKASI (PILIH SATU PAKET LENGKAP):
-    Kamu WAJIB memilih SATU set lokasi dari array berikut dan membaginya ke field yang sesuai:
+    ATURAN KRITIS UNTUK LOKASI (DYNAMIC SCHEMA):
+    Kamu WAJIB memilih SATU dictionary lokasi utuh dari array berikut, lalu menyalin SEMUA key dan value-nya langsung ke dalam JSON utamamu:
     {json.dumps(VALID_LOCATIONS)}
     
+    Contoh Output jika memilih Indonesia:
+    {{
+        "Input Company Name": "PT Nusantara",
+        "Input Email": "admin@nusantara.com",
+        "phone_country_code": "Indonesia",
+        "Input Phone": "8123456789",
+        "Choose Industry Type": "Technology",
+        "Choose Company Type": "Private",
+        "Choose Language": "Indonesian",
+        "Input Address": "Jl. Merdeka No 1",
+        "Country": "Indonesia",
+        "Choose Province": "Jawa Barat",
+        "Choose City": "Bandung",
+        "Choose District": "Sumur Bandung",
+        "Choose Sub District": "Babakan Ciamis",
+        "Choose Postal Code": "40111"
+    }}
     Format Key wajib:
     "Input Company Name", "Input Email", "phone_country_code", "Input Phone",
     "Choose Industry Type", "Choose Company Type", "Choose Language", "Input Address",
