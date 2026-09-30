@@ -8,6 +8,7 @@ from playwright.sync_api import Page
 from pydantic import BaseModel, ValidationError
 from faker import Faker
 from openai import OpenAI
+import random
 
 # Mendaftarkan folder root proyek ke sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -39,6 +40,11 @@ class BusinessTestData(BaseModel):
 
 # --- 2. Modul Generator ---
 def generate_fallback_data() -> BusinessTestData:
+
+    valid_industries = [
+        "Importer/Exporter", "Marketplace", "Retailer", 
+        "Service Aggregator", "Holding Company"
+    ]
     """Fallback deterministik menggunakan Faker"""
     return BusinessTestData(
         company=CompanyData(
@@ -66,6 +72,9 @@ def generate_ai_business_data() -> BusinessTestData:
     
     prompt = """
     Generate coherent, realistic Indonesian business data.
+    For the industry/company type field, YOU MUST strictly choose ONLY ONE from this exact list:
+    ["Importer/Exporter", "Consignor/Consignee", "Marketplace", "Retailer", "Service Aggregator", "Third-Party Logistics (3PL) Provider", "Holding Company", "Cooperative (Co-op)", "Franchisee/Franchisor", "Manufacturer"]
+    
     Output MUST be a valid JSON matching this schema exactly:
     {
         "company": {"legal_name": "", "email": "", "phone": "", "street_address": "", "industry": ""},
