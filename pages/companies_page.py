@@ -1,3 +1,6 @@
+from pytest_playwright.pytest_playwright import page
+
+
 class CompaniesPage:
     def __init__(self, page):
         self.page = page
@@ -98,27 +101,17 @@ class CompaniesPage:
         self.page.wait_for_timeout(30000)
 
     def open_company_detail(self, company_name):
-        """Mencari kartu perusahaan di halaman list dan mengeklik tombol Manage"""
-
-    
-    # 1. Tunggu seketika selepas halaman bertukar untuk memastikan DOM sedia ada
-        self.page.wait_for_timeout(3000)
-    
-    # 2. Tatal terus ke bahagian paling bawah halaman menggunakan JavaScript.
-    # Cara ini lebih terjamin berbanding menekan butang 'End' pada papan kekunci.
-        self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-    
-    # 3. Tunggu masa respons (render) sekiranya aplikasi mempunyai 'lazy loading' selepas ditatal
         self.page.wait_for_timeout(2000)
     
-    # 4. Kenal pasti kad syarikat menggunakan nama dinamik daripada Faker
-        company_card = self.page.locator("div.card").filter(has_text=company_name)
+    # 2. Scroll mentok ke bawah halaman menggunakan JavaScript
+        self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
     
-    # 5. Paksa sistem menunggu sehingga kad itu benar-benar kelihatan di skrin (maksimum 30 saat)
-        company_card.wait_for(state="visible", timeout=30000)
+    # 3. Tunggu sebentar agar sistem sempat merender kartu baru (lazy loading)
+        self.page.wait_for_timeout(2000)
     
-    # 6. Klik butang pengurusan
-        company_card.get_by_role("button", name="Manage").click()
+    # 4. Ambil card urutan PALING TERAKHIR di layar saat ini, lalu klik Manage
+        self.page.locator("div.card").last.get_by_role("button", name="Manage").click()
+        
 
     def delete_company(self):
         self.delete_company_btn.click()

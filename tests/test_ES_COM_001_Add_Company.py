@@ -51,11 +51,7 @@ def test_add_company(page):
         print("\n[INFO] Memvalidasi data tersimpan di halaman detail...")
         expect(page.locator("h1")).to_contain_text(company_name)
     with allure.step("Validate saved company data"):
-    # Validasi dinamis untuk semua value yang di-generate
         for key, value in ai_data.items():
-            if key in ["phoneNumber", "phone_country_code"]:
-                continue
-            
             print(f"Memastikan teks muncul di layar: {value}")
             elemen_teks = page.get_by_text(str(value), exact=False).first
             expect(elemen_teks).to_be_visible()
