@@ -100,17 +100,31 @@ class CompaniesPage:
         self.register_btn.click()
         self.page.wait_for_timeout(30000)
 
-    def open_company_detail(self, company_name):
-        self.page.wait_for_timeout(20000)
+    def open_company_detail(self):
+        print("Menunggu halaman stabil...")
+        self.page.wait_for_timeout(3000)
     
-    # 2. Scroll mentok ke bawah halaman menggunakan JavaScript
+    # 1. Paksa scroll ke paling bawah agar aplikasi memuat UI-nya
         self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        self.page.wait_for_timeout(2000) # Kasih jeda agar render selesai
     
-    # 3. Tunggu sebentar agar sistem sempat merender kartu baru (lazy loading)
-        self.page.wait_for_timeout(20000)
+    # 2. Fokus SATU kartu saja, yaitu kartu urutan paling akhir (.last)
+        kartu_terakhir = self.page.locator("div.bg-card").last
     
-    # 4. Ambil card urutan PALING TERAKHIR di layar saat ini, lalu klik Manage
-        self.page.locator("div.bg-card").filter(has_text="Rodriguez, F").get_by_role("button", name="Manage").last.click()
+    # 3. KRUSIAL: Pastikan kartu ini benar-benar ditarik masuk ke tengah layar
+        kartu_terakhir.scroll_into_view_if_needed()
+    
+    # 4. Ambil tombol Manage di dalam kartu terakhir tersebut
+        tombol_manage = kartu_terakhir.get_by_role("button", name="Manage")
+    
+    # 5. Hajar kliknya! Gunakan force=True untuk menembus halangan apapun
+        print("Mengeklik tombol Manage pada data paling bawah...")
+        tombol_manage.click(force=True)
+    
+    # 6. Tangani halaman loading "Please wait..." setelah diklik
+        loading_text = self.page.get_by_text("Please wait...", exact=False).first
+        if loading_text.is_visible():
+            loading_text.wait_for(state="hidden", timeout=15000)
         
 
     def delete_company(self):
