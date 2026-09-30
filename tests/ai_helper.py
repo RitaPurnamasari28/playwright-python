@@ -25,14 +25,14 @@ VALID_LOCATIONS = [
         "Choose City": "Jayapura", 
         "Choose District": "Abepura", 
         "Choose Sub District": "Koya Koso", 
-        "Choose Postal Code": "99112"
+        #"Choose Postal Code": "99112"
     },
     {
         "Country": "Malaysia", 
         "Choose State": "Selangor", 
         "Choose City": "Petaling Jaya", 
         "Choose Location": "Damansara", 
-        "Choose Postal Code": "47400"
+        #"Choose Postal Code": "47400"
     },
     {
         "Country": "Philippines",
@@ -40,14 +40,14 @@ VALID_LOCATIONS = [
         "Choose Province": "Metro Manila",
         "Choose City": "Makati",
         "Choose Barangay": "Bel-Air",
-        "Choose Postal Code": "1209"
+        #"Choose Postal Code": "1209"
     },
     {
         "Country": "Cambodia",
         "Choose Province": "Phnom Penh",
         "Choose District": "Chamkar Mon",
         "Choose Commune": "Tonle Basak",
-        "Choose Postal Code": "120101"
+        #"Choose Postal Code": "120101"
     }
 ]
 

@@ -11,3 +11,14 @@ Pastikan sistem Anda sudah menginstal:
 ### Instalasi Python Dependencies
 ```bash
 pip install -r requirements.txt
+
+### playwright install
+```bash
+playwright install --with-deps
+
+### how to run each suite
+pytest tests/test_ES_LOG_001_Login.py --headed --slowmo=500 --alluredir=allure-results
+
+### how to generate and open the Allure report
+allure generate allure-results --clean -o allure-report
+allure open allure-report
