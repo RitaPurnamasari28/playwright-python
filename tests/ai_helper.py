@@ -24,7 +24,7 @@ VALID_LOCATIONS = [
         "Choose Province": "Papua", 
         "Choose City": "Jayapura", 
         "Choose District": "Abepura", 
-        "Choose Sub District": "Hilirig", 
+        "Choose Sub District": "Koya Koso", 
         "Choose Postal Code": "99112"
     },
     {
