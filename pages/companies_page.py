@@ -100,11 +100,10 @@ class CompaniesPage:
     def open_company_detail(self, company_name):
         """Mencari kartu perusahaan di halaman list dan mengeklik tombol Manage"""
         # Mencari blok div yang menaungi nama perusahaan tersebut
-        kartu_perusahaan = self.page.locator("div").filter(has=self.page.get_by_text(company_name, exact=True)).last
-        
-        # Scroll dan klik tombol Manage di dalam kartu tersebut
-        kartu_perusahaan.scroll_into_view_if_needed()
-        kartu_perusahaan.get_by_role("button", name="Manage", exact=True).click()
+        company_card = self.page.locator("div.card").filter(has_text=company_name)
+
+        # Di dalam kotak card tersebut, barulah cari dan klik tombol Manage
+        company_card.get_by_role("button", name="Manage").click()
 
     def delete_company(self):
         self.delete_company_btn.click()
