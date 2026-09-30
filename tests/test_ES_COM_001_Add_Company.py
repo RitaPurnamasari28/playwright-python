@@ -4,7 +4,6 @@ from pages.login_page import LoginPage
 from pages.home_page import HomePage
 from pages.companies_page import CompaniesPage
 
-# Pastikan fungsi yang sudah diperbaiki (yang mengunci pilihan dropdown) 
 # ada di dalam file ai_helper.py ini
 from ai_helper import generate_full_company_data
 

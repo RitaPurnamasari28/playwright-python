@@ -4,14 +4,19 @@ import random
 from faker import Faker
 from openai import OpenAI
 
+# 1. KUNCI JAWABAN DROPDOWN UI (Mencegah Playwright Timeout)
+VALID_COMPANY_TYPES = [
+    "Importer/Exporter", "Consignor/Consignee", "Marketplace", "Retailer", 
+    "Service Aggregator", "Third-Party Logistics (3PL) Provider", 
+    "Holding Company", "Cooperative (Co-op)", "Franchisee/Franchisor", "Manufacturer"
+]
+
 def get_faker_fallback_data():
     """Deterministic fallback using Faker."""
     print("\n[INFO] API Key tidak ditemukan atau API gagal. Menggunakan Deterministic Fallback (Faker)...")
     
-    # Supaya benar-benar 'deterministic' (hasilnya konsisten dan bisa diprediksi untuk testing)
-    # kita bisa set seed opsional jika diperlukan, tapi random biasa sudah cukup baik.
     fake = Faker('en_US')
-    Faker.seed(42) # Opsional: Membuat data Faker selalu sama setiap di-run (sangat disukai di CI)
+    Faker.seed(42)
     random.seed(42) 
     
     valid_locations = [
@@ -29,8 +34,8 @@ def get_faker_fallback_data():
         "phone_country_code": loc["country"],
         "Input Phone": f"812{random.randint(1000000, 9999999)}",
         "Choose Industry Type": "Technology", 
-        "Choose Company Type": "Private",     
-        "Choose Language": "English",         
+        "Choose Company Type": random.choice(VALID_COMPANY_TYPES), # <-- DIPERBAIKI! Tidak lagi hardcode "Private"
+        "Choose Language": "English",        
         "Input Address": fake.street_address(),
         "Country": loc["country"],
         "Choose State": loc["state"],
@@ -44,16 +49,19 @@ def generate_full_company_data():
     Fungsi utama: Mengecek API Key terlebih dahulu.
     Jika tidak ada API Key, langsung masuk ke deterministic fallback (Faker).
     """
-    # 1. Cek keberadaan API Key secara eksplisit (Menjawab requirement test)
     api_key = os.environ.get("OPENAI_API_KEY")
     
     if not api_key:
         return get_faker_fallback_data()
 
-    # 2. Jika API Key ada, coba gunakan AI
-    prompt = """
+    # 2. PROMPT DITAMBAHKAN ATURAN KRITIS
+    prompt = f"""
     Kamu adalah asisten QA Automation. Hasilkan JSON data perusahaan dummy.
     Negara wajib dari: Cambodia, Indonesia, Malaysia, Philippines.
+    
+    ATURAN KRITIS UNTUK DROPDOWN:
+    - Untuk "Choose Company Type", KAMU WAJIB memilih HANYA SATU dari daftar persis ini: {json.dumps(VALID_COMPANY_TYPES)}
+    
     Format Key wajib:
     "Input Company Name", "Input Email", "phone_country_code", "Input Phone",
     "Choose Industry Type", "Choose Company Type", "Choose Language", "Input Address",
@@ -61,11 +69,10 @@ def generate_full_company_data():
     """
 
     try:
-        # Client bisa diarahkan ke OpenAI asli atau Groq tergantung key yang dipasang
         client = OpenAI(api_key=api_key, timeout=5.0)
         
         response = client.chat.completions.create(
-            model="gpt-4o-mini", # Atau model lain yang didukung
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"}
         )
@@ -74,6 +81,5 @@ def generate_full_company_data():
         return json.loads(response.choices[0].message.content)
         
     except Exception as e:
-        # 3. Fallback kedua jika API Key ada tapi saldonya habis (error 429) atau timeout
         print(f"\n[WARNING] Eksekusi API gagal ({e}). Beralih ke Fallback...")
         return get_faker_fallback_data()
