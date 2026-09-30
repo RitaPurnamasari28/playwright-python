@@ -11,16 +11,15 @@ import allure
 def test_login_valid_credentials(page):
     # 1. Inisialisasi POM Login
     login_page = LoginPage(page)
-    
-    # 2. Set email dan password Anda secara langsung (hardcode)
-    
-    
     login_email = "it.qa@edot.id"
     login_password = "it.QA2025U"
     
     # 3. Eksekusi Test Steps
-    login_page.navigate()
-    login_page.do_login(login_email, login_password)
-    login_page.verif_login_success()
+    with allure.step("Open esuite"):
+        login_page.navigate()
+    with allure.step("Perform login"):
+        login_page.do_login(login_email, login_password)
+    with allure.step("Verify login success"):
+        login_page.verify_login_success()
     
     

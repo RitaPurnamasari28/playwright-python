@@ -14,6 +14,6 @@ class HomePage:
         self.menu_companies.click()
 
     # --- Assertions ---
-    def verify_login_success(self):
+    def verify_success_opencompanies_page(self):
         # Guardrail: Tetap strict tanpa try/except
         expect(self.successopencompanies_page).to_be_visible(timeout=10000)

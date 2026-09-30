@@ -6,6 +6,7 @@ from ai_helper import generate_full_company_data
 from pages.companies_page import CompaniesPage
 from pages.login_page import LoginPage
 from playwright.sync_api import expect
+import allure
 
 def test_login_valid_credentials(page):
     ai_data = generate_full_company_data()
@@ -18,7 +19,10 @@ def test_login_valid_credentials(page):
     login_password = ""
     
     # 3. Eksekusi Test Steps
-    login_page.navigate()
-    login_page.do_login(login_email, login_password)
-    login_page.verif_login_success()
-    
+    with allure.step("Open esuite"):
+        login_page.navigate()
+    with allure.step("Perform login"):
+        login_page.do_login(login_email, login_password)
+    with allure.step("Verify login success"):
+        login_page.verify_login_success()
+
