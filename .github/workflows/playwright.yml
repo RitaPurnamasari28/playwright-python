@@ -27,6 +27,7 @@ jobs:
         pip install pytest playwright google-generativeai
         # Sesuaikan dengan nama file requirements-mu jika ada
         pip install pytest playwright google-generativeai python-dotenv
+        pip install pytest playwright google-generativeai python-dotenv allure-pytest
 
         
     - name: Install Playwright Browsers
