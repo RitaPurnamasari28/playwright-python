@@ -1,0 +1,20 @@
+# Virtual Environment
+venv/
+env/
+
+# Secrets / Environment Variables
+.env
+
+# Python & Pytest Caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Playwright Reports & Caches
+test-results/
+playwright-report/
+blob-report/
+
+# Allure Reports
+allure-results/
+allure-results--headed/

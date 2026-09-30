@@ -1,0 +1,67 @@
+name: E2E Automation Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Sesuaikan dengan nama file requirements-mu jika ada
+        pip install pytest playwright pytest-playwright allure-pytest openai faker
+        
+    - name: Install Playwright Browsers
+      run: playwright install --with-deps chromium
+
+    - name: Run Playwright Tests
+      run: pytest tests/ --alluredir=allure-results
+      continue-on-error: true # Mencegah pipeline langsung mati jika tes gagal
+
+    - name: Run AI Failure Triage
+      if: always() # Wajib berjalan meski langkah sebelumnya gagal
+      env:
+        # Mengambil API key dari GitHub Secrets
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      run: python triage.py
+
+    - name: Generate Allure Report
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      id: allure-report
+      with:
+        allure-results: allure-results
+        gh_pages: gh-pages
+        allure_report: allure-report
+        allure_history: allure-history
+
+    - name: Attach Markdown Files to Report
+      if: always()
+      run: |
+        # Memasukkan file markdown ke dalam folder laporan agar ikut ter-deploy
+        cp triage_report.md allure-report/ || true
+        cp AI_USAGE.md allure-report/ || true
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: always()
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: allure-report
