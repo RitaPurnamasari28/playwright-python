@@ -95,6 +95,7 @@ class CompaniesPage:
         self.usecompanydata_btn.click()
         self.checkbox.click()
         self.register_btn.click()
+        self.page.wait_for_timeout(30000)
 
     def open_company_detail(self, company_name):
         """Mencari kartu perusahaan di halaman list dan mengeklik tombol Manage"""
