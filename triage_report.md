@@ -5,7 +5,7 @@
 ### Test: test_add_company[chromium]
 **Verdict:** [Script/Environment Defect]
 **Evidence:** Fallback Logic: Exception detected (timeout/element not found). The locator likely failed to resolve, indicating a script or environment issue.
-**Raw Error:** `playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.`
+**Raw Error:** `playwright._impl._errors.Error: Locator.click: Error: strict mode violation: locator("div").filter(has_text="Country*").locator("button[role=\"combobox\"]") resolved to 5 elements:`
 
 ---
 
