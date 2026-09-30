@@ -47,7 +47,7 @@ def test_add_company(page):
         mycompany_header = page.get_by_text("My Company", exact=True)
         expect(mycompany_header).to_be_visible()
     with allure.step("Open company detail page"):
-        companies_page.buka_detail_perusahaan(company_name)
+        companies_page.open_company_detail(company_name)
         print("\n[INFO] Memvalidasi data tersimpan di halaman detail...")
         expect(page.locator("h1")).to_contain_text(company_name)
     with allure.step("Validate saved company data"):
