@@ -101,13 +101,13 @@ class CompaniesPage:
         self.page.wait_for_timeout(30000)
 
     def open_company_detail(self, company_name):
-        self.page.wait_for_timeout(2000)
+        self.page.wait_for_timeout(20000)
     
     # 2. Scroll mentok ke bawah halaman menggunakan JavaScript
         self.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
     
     # 3. Tunggu sebentar agar sistem sempat merender kartu baru (lazy loading)
-        self.page.wait_for_timeout(2000)
+        self.page.wait_for_timeout(20000)
     
     # 4. Ambil card urutan PALING TERAKHIR di layar saat ini, lalu klik Manage
         self.page.locator("div.bg-card").filter(has_text="Rodriguez, F").get_by_role("button", name="Manage").click()
