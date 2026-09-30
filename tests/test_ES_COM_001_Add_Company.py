@@ -34,6 +34,8 @@ def test_add_company(page):
     with allure.step("click add company button"):
         companies_page.add_company_btn()
     with allure.step("fill form company data"):
+        ai_data = generate_full_company_data()
+        company_name = ai_data["Input Company Name"]
         companies_page.fill_form_autonomously(ai_data)
 
     # 4. Lanjut ke step berikutnya

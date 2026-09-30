@@ -2,7 +2,14 @@ import os
 import json
 import random
 from faker import Faker
-from openai import OpenAI
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Konfigurasi agar Python membaca API Key dari file .env
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+fake = Faker()
 
 # =================================================================
 # KUNCI JAWABAN DROPDOWN UI 
@@ -80,55 +87,31 @@ def get_faker_fallback_data():
     return base_data
 
 def generate_full_company_data():
-    """Fungsi utama menggunakan AI dengan Guardrails ketat."""
-    api_key = os.environ.get("OPENAI_API_KEY")
-    
-    if not api_key:
-        return get_faker_fallback_data()
-
-    prompt = f"""
-    Kamu adalah asisten QA Automation. Hasilkan JSON data perusahaan dummy berformat flat dictionary.
-    
-    ATURAN KRITIS UNTUK FIELD DROPDOWN (PILIH SALAH SATU YANG SESUAI):
-    - "Choose Company Type" WAJIB dari: {json.dumps(VALID_COMPANY_TYPES)}
-    - "Choose Industry Type" WAJIB dari: {json.dumps(VALID_INDUSTRY_TYPES)}
-    - "Choose Language" WAJIB dari: {json.dumps(VALID_LANGUAGES)}
-    
-    ATURAN KRITIS UNTUK LOKASI (DYNAMIC SCHEMA):
-    Kamu WAJIB memilih SATU dictionary lokasi utuh dari array berikut, lalu menyalin SEMUA key dan value-nya langsung ke dalam JSON utamamu:
-    {json.dumps(VALID_LOCATIONS)}
-    
-    Contoh Output jika memilih Indonesia:
-    {{
-        "Input Company Name": "PT Nusantara",
-        "Input Email": "admin@nusantara.com",
-        "phone_country_code": "Indonesia",
-        "Input Phone": "8123456789",
-        "Choose Industry Type": "Technology",
-        "Choose Company Type": "Retailer",
-        "Choose Language": "Indonesian",
-        "Input Address": "Jl. Merdeka No 1",
-        "Country": "Indonesia",
-        "Choose Province": "Jawa Barat",
-        "Choose City": "Bandung",
-        "Choose District": "Sumur Bandung",
-        "Choose Sub District": "Babakan Ciamis",
-        "Choose Postal Code": "40111"
-    }}
-    """
-
     try:
-        client = OpenAI(api_key=api_key, timeout=5.0)
+        # Menggunakan Gemini 1.5 Flash (sangat cepat dan gratis)
+        model = genai.GenerativeModel('gemini-1.5-flash') 
         
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
+        # Perhatikan instruksi max 25 characters agar tidak gagal di UI
+        prompt = """
+        Generate random company data for registration form in JSON format.
+        Rules:
+        1. "Input Company Name": Random company name, maximum 25 characters.
+        2. "Input Email": Random professional email.
+        Return ONLY a valid JSON object.
+        """
+        
+        # Temperature 0.7 memastikan datanya selalu random/acak setiap kali dijalankan
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.GenerationConfig(
+                response_mime_type="application/json",
+                temperature=0.7 
+            )
         )
         
-        print("\n[INFO] Berhasil menggunakan AI untuk generate data!")
-        return json.loads(response.choices[0].message.content)
+        return json.loads(response.text)
         
     except Exception as e:
-        print(f"\n[WARNING] Eksekusi API gagal ({e}). Beralih ke Fallback...")
+        print(f"Gemini API gagal, menggunakan Faker... Error: {e}")
+        # Jika kuota habis atau internet putus, otomatis pakai data Faker
         return get_faker_fallback_data()

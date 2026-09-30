@@ -1,0 +1,6 @@
+pytest
+playwright
+allure-pytest
+faker
+google-generativeai
+python-dotenv
