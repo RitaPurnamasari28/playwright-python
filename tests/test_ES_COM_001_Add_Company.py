@@ -53,7 +53,6 @@ def test_add_company(page):
     with allure.step("Validate saved company data"):
     # Validasi dinamis untuk semua value yang di-generate
         for key, value in ai_data.items():
-        # Lewati validasi otomatis untuk field yang format tampilannya berubah di UI
             if key in ["phoneNumber", "phone_country_code"]:
                 continue
             
