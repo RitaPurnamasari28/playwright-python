@@ -24,10 +24,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest playwright google-generativeai
-        # Sesuaikan dengan nama file requirements-mu jika ada
-        pip install pytest playwright google-generativeai python-dotenv
-        pip install pytest playwright google-generativeai python-dotenv allure-pytest
+        pip install -r requirements.txt
 
         
     - name: Install Playwright Browsers
