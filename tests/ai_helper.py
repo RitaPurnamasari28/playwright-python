@@ -21,11 +21,11 @@ VALID_LANGUAGES = ["English", "Indonesian"]
 VALID_LOCATIONS = [
     {
         "Country": "Indonesia", 
-        "Choose Province": "Jawa Barat", 
-        "Choose City": "Bandung", 
-        "Choose District": "Sumur Bandung", 
-        "Choose Sub District": "Babakan Ciamis", 
-        "Choose Postal Code": "40111"
+        "Choose Province": "Papua", 
+        "Choose City": "Jayapura", 
+        "Choose District": "Abepura", 
+        "Choose Sub District": "Hilirig", 
+        "Choose Postal Code": "99112"
     },
     {
         "Country": "Malaysia", 
