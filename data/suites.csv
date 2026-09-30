@@ -1,0 +1,4 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","36062","test_login_valid_credentials[chromium]","tests","2026-09-30","broken","2026-09-30","","test_loginfail","",""
+"","10544","test_add_company[chromium]","tests","2026-09-30","broken","2026-09-30","","test_ES_COM_001_Add_Company","",""
+"","8721","test_login_valid_credentials[chromium]","tests","2026-09-30","broken","2026-09-30","","test_ES_LOG_001_Login","",""
