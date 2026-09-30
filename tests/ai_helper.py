@@ -4,11 +4,26 @@ import random
 from faker import Faker
 from openai import OpenAI
 
-# 1. KUNCI JAWABAN DROPDOWN UI (Mencegah Playwright Timeout)
+# =================================================================
+# 1. KUNCI JAWABAN DROPDOWN UI (Wajib disamakan persis dengan UI)
+# =================================================================
 VALID_COMPANY_TYPES = [
     "Importer/Exporter", "Consignor/Consignee", "Marketplace", "Retailer", 
     "Service Aggregator", "Third-Party Logistics (3PL) Provider", 
     "Holding Company", "Cooperative (Co-op)", "Franchisee/Franchisor", "Manufacturer"
+]
+
+# TODO: Sesuaikan daftar ini dengan opsi yang benar-benar ada di UI Anda!
+VALID_INDUSTRY_TYPES = ["Technology", "Finance", "Healthcare", "Education", "Retail"] 
+VALID_LANGUAGES = ["English", "Indonesian"]
+
+# Untuk lokasi, kita kunci dalam satu paket agar AI/Faker tidak mencampuradukkan 
+# provinsi dan kota yang tidak nyambung (mencegah dropdown kosong).
+VALID_LOCATIONS = [
+    {"country": "Indonesia", "state": "Jawa Barat", "city": "Bandung", "location": "Sumur Bandung", "postal": "40111"},
+    {"country": "Malaysia", "state": "Selangor", "city": "Petaling Jaya", "location": "Damansara", "postal": "47400"},
+    {"country": "Philippines", "state": "Metro Manila", "city": "Makati", "location": "Bel-Air", "postal": "1209"},
+    {"country": "Cambodia", "state": "Phnom Penh", "city": "Phnom Penh", "location": "Daun Penh", "postal": "12200"}
 ]
 
 def get_faker_fallback_data():
@@ -19,23 +34,16 @@ def get_faker_fallback_data():
     Faker.seed(42)
     random.seed(42) 
     
-    valid_locations = [
-        {"country": "Indonesia", "state": "Jawa Barat", "city": "Bandung", "location": "Sumur Bandung", "postal": "40111"},
-        {"country": "Malaysia", "state": "Selangor", "city": "Petaling Jaya", "location": "Damansara", "postal": "47400"},
-        {"country": "Philippines", "state": "Metro Manila", "city": "Makati", "location": "Bel-Air", "postal": "1209"},
-        {"country": "Cambodia", "state": "Phnom Penh", "city": "Phnom Penh", "location": "Daun Penh", "postal": "12200"}
-    ]
-    
-    loc = random.choice(valid_locations)
+    loc = random.choice(VALID_LOCATIONS)
     
     return {
         "Input Company Name": fake.company(),
         "Input Email": fake.company_email(),
         "phone_country_code": loc["country"],
         "Input Phone": f"812{random.randint(1000000, 9999999)}",
-        "Choose Industry Type": "Technology", 
-        "Choose Company Type": random.choice(VALID_COMPANY_TYPES), # <-- DIPERBAIKI! Tidak lagi hardcode "Private"
-        "Choose Language": "English",        
+        "Choose Industry Type": random.choice(VALID_INDUSTRY_TYPES), 
+        "Choose Company Type": random.choice(VALID_COMPANY_TYPES), 
+        "Choose Language": random.choice(VALID_LANGUAGES),        
         "Input Address": fake.street_address(),
         "Country": loc["country"],
         "Choose State": loc["state"],
@@ -45,22 +53,24 @@ def get_faker_fallback_data():
     }
 
 def generate_full_company_data():
-    """
-    Fungsi utama: Mengecek API Key terlebih dahulu.
-    Jika tidak ada API Key, langsung masuk ke deterministic fallback (Faker).
-    """
+    """Fungsi utama menggunakan AI dengan Guardrails ketat."""
     api_key = os.environ.get("OPENAI_API_KEY")
     
     if not api_key:
         return get_faker_fallback_data()
 
-    # 2. PROMPT DITAMBAHKAN ATURAN KRITIS
+    # 2. PROMPT DENGAN GUARDRAILS UNTUK SEMUA DROPDOWN
     prompt = f"""
     Kamu adalah asisten QA Automation. Hasilkan JSON data perusahaan dummy.
-    Negara wajib dari: Cambodia, Indonesia, Malaysia, Philippines.
     
-    ATURAN KRITIS UNTUK DROPDOWN:
-    - Untuk "Choose Company Type", KAMU WAJIB memilih HANYA SATU dari daftar persis ini: {json.dumps(VALID_COMPANY_TYPES)}
+    ATURAN KRITIS UNTUK FIELD DROPDOWN (PILIH SALAH SATU YANG SESUAI):
+    - "Choose Company Type" WAJIB dari: {json.dumps(VALID_COMPANY_TYPES)}
+    - "Choose Industry Type" WAJIB dari: {json.dumps(VALID_INDUSTRY_TYPES)}
+    - "Choose Language" WAJIB dari: {json.dumps(VALID_LANGUAGES)}
+    
+    ATURAN KRITIS UNTUK LOKASI (PILIH SATU PAKET LENGKAP):
+    Kamu WAJIB memilih SATU set lokasi dari array berikut dan membaginya ke field yang sesuai:
+    {json.dumps(VALID_LOCATIONS)}
     
     Format Key wajib:
     "Input Company Name", "Input Email", "phone_country_code", "Input Phone",
