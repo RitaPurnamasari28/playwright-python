@@ -64,7 +64,7 @@ def get_faker_fallback_data():
     
     # Buat data dasar
     base_data = {
-        "Input Company Name": fake.company(),
+        "Input Company Name": fake.company()[:12],
         "Input Email": fake.company_email(),
         "phone_country_code": loc["Country"], # Menggunakan "Country" kapital agar cocok dengan dict
         "Input Phone": f"812{random.randint(1000000, 9999999)}",
