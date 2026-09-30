@@ -42,11 +42,16 @@ class CompaniesPage:
                 
             # 2. Dropdown Country Utama
             if key == "Country":
-                dropdown = self.page.locator('div').filter(has_text="Country*").locator('button[role="combobox"]')
+                # Langsung target combobox dengan teks spesifik dan amankan dengan .first
+                dropdown = self.page.locator('button[role="combobox"]').filter(has_text="Choose Country").first
+                
+                dropdown.wait_for(state="visible")
                 dropdown.click()
                 self.page.wait_for_timeout(500)
-                self.page.get_by_role("option", name=value, exact=True).click()
-                self.page.wait_for_timeout(1000) # Jeda agar API State memuat
+                
+                # Gunakan exact=False dan .first sama seperti aturan dropdown lainnya
+                self.page.get_by_role("option", name=value, exact=False).first.click()
+                self.page.wait_for_timeout(1000) 
                 continue
 
             # 3. Text Input (Company Name, Email, Phone, Address)
