@@ -24,6 +24,8 @@ def test_add_company(page):
         home_page.open_companies_page()
     with allure.step("verify success open companies page"):
         home_page.verify_success_opencompanies_page()
+    
+    
     ai_data = generate_full_company_data()
     company_name = ai_data["Input Company Name"]
 
