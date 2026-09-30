@@ -18,7 +18,7 @@ def test_add_company(page):
         login_page.navigate()
     with allure.step("input email and password then click login button"):
         login_page.do_login(login_email, login_password)
-    with allure.step("ver"):
+    with allure.step("verify login success"):
         login_page.verify_login_success()
 
 # 4. open companies menu
