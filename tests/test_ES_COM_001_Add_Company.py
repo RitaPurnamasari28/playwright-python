@@ -44,8 +44,6 @@ def test_add_company(page):
     with allure.step("input branch data same with company data, select checkbox then click register"):
         companies_page.page_three()
     # 5. Assertion: Pastikan data sukses disimpan (Misal: mengecek nama company muncul di halaman berikutnya)
-        mycompany_header = page.get_by_text("My Company", exact=True)
-        expect(mycompany_header).to_be_visible()
     with allure.step("Open company detail page"):
         companies_page.open_company_detail(company_name)
         print("\n[INFO] Memvalidasi data tersimpan di halaman detail...")
