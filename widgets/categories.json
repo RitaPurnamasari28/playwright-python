@@ -1,0 +1,1 @@
+{"total":2,"items":[{"uid":"4c9330bba04baff453d78a2a995865cd","name":"Assertion Failures","statistic":{"failed":1,"broken":0,"skipped":0,"passed":0,"unknown":0,"total":1}},{"uid":"16eefee1bc25c7334a7a675423273d5e","name":"Locator & Timeout Errors","statistic":{"failed":0,"broken":1,"skipped":0,"passed":0,"unknown":0,"total":1}}]}
