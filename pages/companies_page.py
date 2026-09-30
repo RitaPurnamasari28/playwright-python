@@ -65,11 +65,17 @@ class CompaniesPage:
                 
             # 4. Dropdown lainnya (Industry, State, City, dll)
             if "Choose" in key:
-                dropdown = self.page.locator('button[role="combobox"]').filter(has_text=key)
+                # Tambahkan .first dan .wait_for() untuk memastikan Playwright mengklik elemen yang benar-benar aktif di layar
+                dropdown = self.page.locator('button[role="combobox"]').filter(has_text=key).first
+                dropdown.wait_for(state="visible")
                 dropdown.click()
-                self.page.wait_for_timeout(500) 
                 
-                self.page.get_by_role("option", name=value, exact=True).click()
+                self.page.wait_for_timeout(1000) # Tambah jeda sedikit lebih lama untuk memastikan animasi dropdown selesai
+                
+                # HAPUS exact=True (atau set exact=False) dan tambahkan .first
+                # Ini akan mengatasi masalah spasi tak terlihat atau duplikasi elemen di DOM
+                opsi_dropdown = self.page.get_by_role("option", name=value, exact=False).first
+                opsi_dropdown.click()
                 
                 if key in ["Choose State", "Choose City", "Choose Location"]:
                     self.page.wait_for_timeout(1000)
