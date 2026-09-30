@@ -1,20 +1,19 @@
 # conftest.py
 import os
+import sys
 import json
 import pytest
 import allure
+from playwright.sync_api import Page
 from pydantic import BaseModel, ValidationError
 from faker import Faker
 from openai import OpenAI
-import allure
-from playwright.sync_api import Page
-import os
-import sys
 
 # Mendaftarkan folder root proyek ke sys.path
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+# Import module triage Anda
+import triage as triage
 
 # Inisialisasi Faker dengan locale Indonesia
 fake = Faker('id_ID')
@@ -107,40 +106,76 @@ def business_data():
     )
     return data
 
-# Tambahkan import ini di bagian atas conftest.py
-import triage as triage # Memanggil file triage.py yang sudah Anda buat
+@pytest.fixture(autouse=True)
+def attach_screenshot_on_failure(page: Page, request):
+    # Jalankan test case
+    yield
 
-# Hook pytest yang berjalan setelah SEMUA test selesai
+    # Cek apakah test case mengalami kegagalan (failed)
+    if request.node.rep_call.failed:
+        # Ambil screenshot dalam bentuk bytes (tidak perlu disimpan ke folder lokal)
+        screenshot_bytes = page.screenshot(full_page=True)
+
+        # Lampirkan ke Allure Report
+        allure.attach(
+            screenshot_bytes,
+            name="screenshot_on_failure",
+            attachment_type=allure.attachment_type.PNG,
+        )
+
+# Hook tambahan untuk mendeteksi status test (passed/failed) di pytest
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    setattr(item, "rep_" + rep.when, rep)
+
+# ==========================================
+# GABUNGAN HOOK SESSION FINISH (Triage & Allure)
+# ==========================================
+@pytest.hookimpl(tryfirst=True)
 def pytest_sessionfinish(session, exitstatus):
+    # 1. LOGIKA AI TRIAGE
     print("\n\n[INFO] Test suite selesai dieksekusi. Memulai AI Triage otomatis...")
-    
-    # Jalankan fungsi run_triage() dari file triage.py
     try:
         triage.run_triage()
     except Exception as e:
         print(f"[ERROR] Gagal menjalankan AI Triage: {e}")
 
-@pytest.fixture(autouse=True)
-def attach_screenshot_on_failure(page: Page, request):
-  # Jalankan test case
-  yield
+    # 2. LOGIKA ALLURE ENVIRONMENT & CATEGORIES
+    # Pastikan nama folder ini sesuai dengan output allure Anda
+    allure_dir = "allure-results"
+    
+    if not os.path.exists(allure_dir):
+        os.makedirs(allure_dir)
 
-  # Cek apakah test case mengalami kegagalan (failed)
-  if request.node.rep_call.failed:
-    # Ambil screenshot dalam bentuk bytes (tidak perlu disimpan ke folder lokal)
-    screenshot_bytes = page.screenshot(full_page=True)
+    # 2a. Membuat file environment.properties
+    env_content = """
+    Browser=Chromium
+    Environment=Staging
+    Framework=Pytest-Playwright
+    Tester=QA Engineer
+    """
+    env_path = os.path.join(allure_dir, "environment.properties")
+    with open(env_path, "w") as f:
+        f.write(env_content.strip())
 
-    # Lampirkan ke Allure Report
-    allure.attach(
-        screenshot_bytes,
-        name="screenshot_on_failure",
-        attachment_type=allure.attachment_type.PNG,
-    )
-
-
-# Hook tambahan untuk mendeteksi status test (passed/failed) di pytest
-@pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-  outcome = yield
-  rep = outcome.get_result()
-  setattr(item, "rep_" + rep.when, rep)
+    # 2b. Membuat file categories.json
+    categories = [
+        {
+            "name": "Locator & Timeout Errors",
+            "traceRegex": ".*TimeoutError.*|.*Locator.*",
+            "matchedStatuses": ["broken"]
+        },
+        {
+            "name": "Assertion Failures",
+            "matchedStatuses": ["failed"]
+        },
+        {
+            "name": "Ignored Tests",
+            "matchedStatuses": ["skipped"]
+        }
+    ]
+    categories_path = os.path.join(allure_dir, "categories.json")
+    with open(categories_path, "w") as f:
+        json.dump(categories, f, indent=4)

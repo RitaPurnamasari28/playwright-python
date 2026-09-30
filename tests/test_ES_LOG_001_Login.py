@@ -19,7 +19,7 @@ def test_login_valid_credentials(page):
         login_page.navigate()
     with allure.step("Perform login"):
         login_page.do_login(login_email, login_password)
-    with allure.step("Verify login success"):
+    with allure.step("verify login success"):
         login_page.verify_login_success()
     
     
