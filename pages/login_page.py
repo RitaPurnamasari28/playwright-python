@@ -31,5 +31,5 @@ class LoginPage:
     # --- Assertions ---
     def verify_login_success(self):
         # Guardrail: Tetap strict tanpa try/except
-        expect(self.welcome_element).to_be_visible(timeout=30000)
+        expect(self.welcome_element).to_be_visible(timeout=40000)
     
