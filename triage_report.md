@@ -4,8 +4,8 @@
 
 ### Test: test_add_company[chromium]
 **Verdict:** [Script/Environment Defect]
-**Evidence:** Fallback Logic: Unknown exception occurred causing the script to halt.
-**Raw Error:** `TypeError: CompaniesPage.open_company_detail() takes 1 positional argument but 2 were given`
+**Evidence:** Fallback Logic: Exception detected (timeout/element not found). The locator likely failed to resolve, indicating a script or environment issue.
+**Raw Error:** `playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.`
 
 ---
 
