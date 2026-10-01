@@ -1,19 +1,22 @@
+#locator and action
 from playwright.sync_api import Page, expect
 
+
 class LoginPage:
+
     def __init__(self, page: Page):
         self.page = page
-        
+
         # --- Locators ---
-        self.loginuseemailorpassword_btn = page.locator("button:text('Use Email or Username')")
-        
-        self.email_input = page.locator("input[name='username']") 
+        self.loginuseemailorpassword_btn = page.locator(
+            "button:text('Use Email or Username')"
+        )
+
+        self.email_input = page.locator("input[name='username']")
         self.login1_btn = page.locator("button:text('Log In')")
         self.password_input = page.locator("input[name='password']")
         self.login2_btn = page.locator("button:text('Log In')")
-        
-        # Contoh elemen penanda login berhasil (misal: tulisan Dashboard muncul)
-        self.welcome_element = page.locator("text='Welcome Back,'") 
+        self.welcome_element = page.locator("text='Welcome Back,'")
 
     # --- Actions ---
     def navigate(self):
@@ -30,6 +33,4 @@ class LoginPage:
 
     # --- Assertions ---
     def verify_login_success(self):
-        # Guardrail: Tetap strict tanpa try/except
         expect(self.welcome_element).to_be_visible(timeout=40000)
-    

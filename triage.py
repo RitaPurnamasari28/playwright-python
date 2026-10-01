@@ -5,15 +5,14 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 def fallback_triage(test_name, error_message):
-    """Logika triase lokal (tanpa API) sesuai dengan urutan dari soal."""
     error_lower = error_message.lower()
     
-    # 1. Exception (element not found, timeout) or failed assertion?
+    # 1.if  error message cpintain "timeout" atau "not found"                                                                                                                                                                                                               Exception (element not found, timeout) or failed assertion?
     if "timeout" in error_lower or "not found" in error_lower or "waiting for" in error_lower or "keyerror" in error_lower or "exception" in error_lower:
         verdict = "Script/Environment Defect"
         evidence = "Fallback Logic: Exception detected (timeout/element not found). The locator likely failed to resolve, indicating a script or environment issue."
     
-    # 2. Failed Assertion?
+    # 2. if error message contain "assert" or "expected"                                                                                                                                                                                                                   Did the locator resolve to the intended, unique element? Did every step before the assertion succeed? Was the expected value correct according to the test case? Does it reproduce consistently? (Intermittent -> flaky).
     elif "assert" in error_lower or "expected" in error_lower:
         verdict = "Product Bug (or Flaky)"
         evidence = "Fallback Logic: Failed assertion detected. The locator resolved and steps succeeded, but the actual value differed from expected. Requires manual check for consistency."
@@ -25,12 +24,14 @@ def fallback_triage(test_name, error_message):
     return f"### Test: {test_name}\n**Verdict:** [{verdict}]\n**Evidence:** {evidence}\n**Raw Error:** `{error_message.splitlines()[0] if error_message else 'None'}`"
 
 def run_triage():
+    # open file form allure results and read the json content, then check if status is failed or broken, 
+    # if yes then run the triage function to get the verdict and evidence, then write the result to a markdown file
     api_key = os.getenv("GEMINI_API_KEY")
     allure_results_dir = "allure-results"
     
-    # Inisialisasi client HANYA jika api_key ada
+    # Only if API key is provided, configure the GenAI client
     genai.configure(api_key=api_key)
-    client = genai.GenerativeModel("gemini-pro") if api_key else None
+    client = genai.GenerativeModel("gemini-1.5-flash") if api_key else None
     
     result_files = glob.glob(os.path.join(allure_results_dir, "*-result.json"))
     
@@ -44,13 +45,14 @@ def run_triage():
             data = json.load(f)
             
         status = data.get("status")
+        #check test with ststua broken or fail and get the error message
         if status in ["failed", "broken"]:
             has_failures = True
             test_name = data.get("name", "Unknown Test")
             error_message = data.get("statusDetails", {}).get("message", "No message")
             trace = data.get("statusDetails", {}).get("trace", "No trace")
             
-            # --- JIKA PUNYA API KEY ---
+            #send AI if API key is provided, otherwise use fallback triage
             if client:
                 prompt = f"""
                 You are a QA Triage Assistant. Analyze the following test failure and assign a verdict: 
@@ -74,7 +76,7 @@ def run_triage():
                 """
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4o-mini",
+                        model="gemini-1.5-flash",
                         messages=[{"role": "user", "content": prompt}],
                         temperature=0.2,
                         max_tokens=250
@@ -88,10 +90,10 @@ def run_triage():
             else:
                 print("[INFO] Tidak ada API Key. Menggunakan Fallback Triase Lokal.")
                 report_content += fallback_triage(test_name, error_message) + "\n\n---\n\n"
-            
+    #if no failures detected     
     if not has_failures:
-        report_content += "🎉 **No failures detected in this run. Great job!**\n"
-        
+        report_content += "**No failures detected in this run. Great job!**\n"
+    #create report if there are failures
     with open("triage_report.md", "w", encoding="utf-8") as f:
         f.write(report_content)
     print("\n[SUCCESS] Triage report generated: triage_report.md")

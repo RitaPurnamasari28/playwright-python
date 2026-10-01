@@ -1,8 +1,6 @@
-# Unified QA Automation Framework (Web & Mobile)
+Framework ini menggunakan arsitektur modular yang menggabungkan **Playwright** untuk pengujian Web
 
-Framework ini menggunakan arsitektur modular yang menggabungkan **Playwright** untuk pengujian Web dan **Maestro** 
-
-## ⚙️ Dependencies
+1. Dependencies
 Pastikan sistem Anda sudah menginstal:
 - pytest
 - playwright
@@ -10,16 +8,21 @@ Pastikan sistem Anda sudah menginstal:
 - faker
 - openai
 
-### Instalasi Python Dependencies
-```bash
+2. Instalasi Python Dependencies
 pip install -r requirements.txt
+- pytest
+- playwright
+- allure-pytest
+- faker
+- google-generativeai
+- python-dotenv
+- pytest-playwright
 
-### playwright install
-```bash
+3. playwright install
 playwright install --with-deps
 
-### how to run each suite and generate allure report
+4. how to run each suite and generate allure report
 pytest tests --headed --slowmo=500 --alluredir=allure-results
 
-### how to open the Allure report
+5. how to open the Allure report
 allure serve allure-results

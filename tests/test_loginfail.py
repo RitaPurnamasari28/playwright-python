@@ -9,12 +9,12 @@ from playwright.sync_api import expect
 import allure
 
 def test_login_valid_credentials(page):
-    # 1. Inisialisasi POM Login
+    #login data
     login_page = LoginPage(page)
     login_email = "it.qa@edot.id"
     login_password = "it.QA2025U"
     
-    # 3. Eksekusi Test Steps
+   # login flow use wrong password. assert will be not appear
     with allure.step("Open esuite"):
         login_page.navigate()
     with allure.step("Perform login"):

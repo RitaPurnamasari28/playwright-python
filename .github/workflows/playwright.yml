@@ -36,11 +36,15 @@ jobs:
       continue-on-error: true # Mencegah pipeline langsung mati jika tes gagal
 
     - name: Run AI Failure Triage
-      if: always() # Wajib berjalan meski langkah sebelumnya gagal
+      if: always()
       env:
-        # Mengambil API key dari GitHub Secrets
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: python triage.py
+        GEMINI_API_KEY: ${{secrets.GEMINI_API_KEY}}
+      run: |
+        python triage.py
+        
+        # [BARU] Menampilkan laporan AI langsung di halaman GitHub Actions!
+        cat triage_report.md >> $GITHUB_STEP_SUMMARY
+        cat AI_USAGE.md >> $GITHUB_STEP_SUMMARY
 
     - name: Generate Allure Report via Command Line
       run: |
