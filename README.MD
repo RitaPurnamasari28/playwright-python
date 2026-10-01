@@ -1,4 +1,4 @@
-Framework ini menggunakan arsitektur modular yang menggabungkan **Playwright** untuk pengujian Web
+Automation testing use **Playwright**
 
 1. Dependencies
 Pastikan sistem Anda sudah menginstal:
